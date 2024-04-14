@@ -3,8 +3,8 @@ import {styles} from "../../css/chatHome/SettingGroupRoom";
 import {AntDesign, Entypo, Feather, FontAwesome, Foundation, Octicons} from "@expo/vector-icons";
 
 
-function InformationGroupRoom({navigation}) {
-
+function InformationGroupRoom({route, navigation}) {
+    const { chatId } = route.params;
 
     return(
         <View style={styles.container}>
@@ -52,7 +52,9 @@ function InformationGroupRoom({navigation}) {
                         {/*Personal page */}
                         <TouchableOpacity
                             style={{alignItems:'center'}}
-                            onPress={()=>{navigation.navigate("AddMember")}}
+                            onPress={()=>{navigation.navigate("AddMember", {
+                                chatId: chatId
+                            })}}
                         >
                             <View style={styles.button}>
                                 <Feather name="user-plus" size={20} color="black" />
@@ -93,7 +95,9 @@ function InformationGroupRoom({navigation}) {
                 <View style={{flex:1, marginTop:15, backgroundColor:'white'}}>
                     <TouchableOpacity
                         style={styles.viewTouchable}
-                        onPress={()=>{navigation.navigate("SeeMembers")}}
+                        onPress={()=>{navigation.navigate("SeeMembers", {
+                            chatId: chatId
+                        })}}
                     >
                         <FontAwesome name="group" size={25} color="black" />
                         <View style={styles.viewTitleTouchable}>
