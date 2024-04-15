@@ -7,10 +7,14 @@ const styles = StyleSheet.create({
         margin:10
     },
     messageReceiver:{
-        maxWidth:"70%",
         backgroundColor:'white',
         marginLeft:5,
         padding:10,
+        borderRadius:10,
+    },
+    messageFile:{
+        backgroundColor:'white',
+        marginBottom:5,
         borderRadius:10,
     },
     messageBoxSender:{
