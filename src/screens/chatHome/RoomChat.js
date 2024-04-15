@@ -32,18 +32,18 @@ const HEIGHT = Dimensions.get('window').height;
 //xử lý button mở setting room
 
 function RoomChat({ route, navigation}) {
-    // const chatId = "519e2898-8e9d-439c-8723-83a1246bd3c9"
-    // const roomName = "hagha";
-    // const userId = "383d9e8a-60f4-49f5-af2e-04504cb5fc65"
+    const chatId = "5c092444-8fc8-4d46-9698-8bfbc5ffae5a"
+    const roomName = "hagha";
+    const userId = "3fd31c45-cef4-4588-94aa-0c2e998b055d"
+    const displayName = "Pham Hoc Gioi";
 
-
-    const { chatId, roomName } = route.params;
+    // const { chatId, roomName, type} = route.params;
     console.log('PARAMS', route.params);
 
     //lấy my user từ redux
     const user = useSelector((state) => state.userData);
-    const userId = user.id;
-    const displayName = user.display_name;
+    // const userId = user.id;
+    // const displayName = user.display_name;
 
     console.log('UUUUU', user);
 
@@ -128,7 +128,7 @@ function RoomChat({ route, navigation}) {
     console.log(fileList)
 
     const [listSelectFile, setListSelectFile] = useState([]);
-    const [openFile, setOpenFile] = useState(true);
+    const [openFile, setOpenFile] = useState(false);
     const [viewSendFile, setViewSendFile] = useState(false);
     const handleOpenFile = () =>{
         setOpenFile(!openFile)
@@ -145,6 +145,17 @@ function RoomChat({ route, navigation}) {
         }
     }, [listSelectFile]);
 
+
+    const handleChangeInfomation=()=>{
+        if(type==="private"){
+            navigation.navigate("InformationSingleRoom", {
+
+            })
+        } else{
+            navigation.navigate("InformationGroupRoom")
+        }
+        // navigation.navigate("InformationGroupRoom")
+    }
 
 
     return(
@@ -168,7 +179,7 @@ function RoomChat({ route, navigation}) {
                 <View style={{flex:1, flexDirection:"row-reverse", alignItems:'center', justifyContent:'space-between'}}>
                     <TouchableOpacity
                         style={{flex:1}}
-                        onPress={()=>{navigation.navigate("InformationSingleRoom")}}
+                        onPress={handleChangeInfomation}
                     >
                         <Entypo name="menu" size={35} color="white" />
                     </TouchableOpacity>

@@ -1,5 +1,5 @@
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
-import {styles} from "../../css/chatHome/SettingSingleRoom";
+import {styles} from "../../css/chatHome/InformationSingleRoom";
 import {FontAwesome, Foundation, Octicons} from "@expo/vector-icons";
 import { Feather } from '@expo/vector-icons';
 

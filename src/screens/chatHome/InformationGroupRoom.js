@@ -1,5 +1,5 @@
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
-import {styles} from "../../css/chatHome/SettingGroupRoom";
+import {styles} from "../../css/chatHome/InformationGroupRoom";
 import {AntDesign, Entypo, Feather, FontAwesome, Foundation, Octicons} from "@expo/vector-icons";
 
 
