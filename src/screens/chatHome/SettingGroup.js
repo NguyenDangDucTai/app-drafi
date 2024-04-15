@@ -1,6 +1,6 @@
-import {Text, TouchableOpacity, View, Modal, Button} from "react-native";
+import {Text, TouchableOpacity, View, Modal, Button, CheckBox} from "react-native";
 import {styles} from "../../css/chatHome/SettingGroup";
-import {FontAwesome} from "@expo/vector-icons";
+import {Entypo, FontAwesome} from "@expo/vector-icons";
 import {useEffect, useState} from "react";
 import {firestore} from "../../../config/FirebaseConfig";
 import QueryKey from "../../constants/QueryKey";
@@ -15,12 +15,20 @@ function SettingGroup({navigation, route}){
     const user = useSelector((state) => state.userData);
     const userId = user.id;
     const [mangerId, setMangerId] = useState();
+    const [settingGroup, setSettingGroup] = useState({
+        allowSendMessage: true,
+    });
+
+
     useEffect(() => {
         firestore.collection("Chats")
             .doc(chatId)
             .get()
             .then((snapshot) => {
                 setMangerId(snapshot.data().managerId)
+                setSettingGroup(snapshot.data()?.setting? snapshot.data().setting: {
+                    allowSendMessage: true,
+                })
             })
     }, [chatId]);
 
@@ -36,9 +44,30 @@ function SettingGroup({navigation, route}){
     const handlePermissionToAdd = () =>{
 
     }
-    const handlePermissionToSend = () =>{
 
+    const handlePermissionToSend = () =>{
+        console.log("check click")
+        setSettingGroup(pre => {
+            const curr = pre.allowSendMessage;
+            console.log(curr)
+            return {
+                ...settingGroup,
+                allowSendMessage: !curr,
+
+            }
+        })
     }
+    useEffect(() => {
+        firestore.collection("Chats")
+            .doc(chatId)
+            .update("setting", settingGroup)
+            .then((snapshot) => {
+                console.log("Set permisson Send message thanh cong")
+            })
+            .catch((error) => {
+                console.error('LỖI THÊM THÀNH VIÊN VÀO NHÓM', error);
+            });
+    }, [settingGroup]);
 
 
     const [showModalDisband, setShowModalDisband] = useState(false);
@@ -126,9 +155,12 @@ function SettingGroup({navigation, route}){
                         style={styles.viewTouchable}
                         onPress={handlePermissionToSend}
                     >
-                        <Text style={{fontSize:18, fontWeight:'bold'}}>
+                        <Text style={{fontSize:18, fontWeight:'bold', flex:1}}>
                             Permission to send messages
                         </Text>
+                        {settingGroup.allowSendMessage && (
+                            <Entypo name="check" size={24} color="black" />
+                        )}
                     </TouchableOpacity>
 
                 </View>

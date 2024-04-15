@@ -74,6 +74,23 @@ function RoomChat({ route, navigation}) {
         setMessage("");
     }
 
+
+    const [mangerId, setMangerId] = useState();
+    const [settingGroup, setSettingGroup] = useState({
+        allowSendMessage: true,
+    });
+    useEffect(() => {
+        firestore.collection("Chats")
+            .doc(chatId)
+            .get()
+            .then((snapshot) => {
+                setMangerId(snapshot.data().managerId)
+                setSettingGroup(snapshot.data()?.setting? snapshot.data().setting: {
+                    allowSendMessage: true,
+                })
+            })
+    }, [chatId]);
+
     //Xu ly image
     function importAllImage(r) {
         const images = {};
@@ -235,17 +252,35 @@ function RoomChat({ route, navigation}) {
                     <Entypo name="emoji-happy" size={24} color="black" />
                 </TouchableOpacity>
                 <View style={{flex:1, marginRight:10, marginVertical:10}}>
-                    <TextInput
-                        style={{fontSize:18}}
-                        value={message}
-                        numberOfLines={2}
-                        multiline={true}
-                        onChangeText={setMessage}
-                        onFocus={()=>{
-                            setopenEmoji(false);
-                            setOpenImage(false);
-                        }}
-                    />
+                    {settingGroup.allowSendMessage?(
+                        <TextInput
+                            style={{fontSize:18}}
+                            value={message}
+                            numberOfLines={2}
+                            multiline={true}
+                            onChangeText={setMessage}
+                            onFocus={()=>{
+                                setopenEmoji(false);
+                                setOpenImage(false);
+                            }}
+                        />
+                    ):(
+                        mangerId === userId?(
+                            <TextInput
+                                style={{fontSize:18}}
+                                value={message}
+                                numberOfLines={2}
+                                multiline={true}
+                                onChangeText={setMessage}
+                                onFocus={()=>{
+                                    setopenEmoji(false);
+                                    setOpenImage(false);
+                                }}
+                            />
+                        ):(
+                            <Text style={{color:'#DDDDDD', textAlign:'center'}}>Chỉ nhóm trưởng mới được nhắn</Text>
+                        )
+                    )}
                 </View>
                 <TouchableOpacity
                     onPress={handleOpenFile}
