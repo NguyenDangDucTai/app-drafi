@@ -4,25 +4,41 @@ import {Entypo, FontAwesome} from "@expo/vector-icons";
 import {useSelector} from "react-redux";
 import useListParticipants from "../../api/useListParticipants";
 import {useEffect, useState} from "react";
+import useListAllFriends from "../../api/useListAllFriends";
+import {firestore} from "../../../config/FirebaseConfig";
 
 
 
-function AddMember({navigation}){
-
+function AddMember({route, navigation}){
     const user = useSelector((state) => state.userData);
     const userId = user.id;
+    const { chatId } = route.params;
 
-    const chatId = "";
-
-    const { listGroup } = useListParticipants(userId);
-    const { participants } = useListParticipants(userId);
+    console.log('userId', userId);
+    const [friendList, setFriendList] = useState([]);
+    const [participants, setParticipants] = useState([]);
 
     const [viewButton, setViewButton] = useState(false);
     const [disableButtonCreate, setDisableButtonCreate] = useState(true)
     const [listAddInGroupId, setListAddInGroupId] = useState([]);
 
+    useEffect(() => {
+        firestore.collection("Users")
+            .doc(userId)
+            .get()
+            .then((snapshot) => {
+                setFriendList(snapshot.data().friends);
+            });
+    }, [userId]);
 
-    console.log('PPPPP', participants);
+    useEffect(() => {
+        firestore.collection("Chats")
+            .doc(chatId)
+            .get()
+            .then((snapshot) => {
+                setParticipants(snapshot.data().participants);
+            })
+    }, [chatId]);
 
     // const listFriend = {};
     useEffect(()=>{
@@ -31,16 +47,25 @@ function AddMember({navigation}){
         } else {
             setViewButton(!viewButton)
         }
-        if(listAddInGroupId.length >= 2){
+        if(listAddInGroupId.length >= 1) {
             setDisableButtonCreate(false)
         } else {
             setDisableButtonCreate(true);
         }
 
+        console.log('LIST ADD IN GROUP ID', listAddInGroupId);
     }, [listAddInGroupId]);
 
-    const handleCreateGroup = () =>{
-
+    const handleAddMemberToGroup = () =>{
+        firestore.collection("Chats")
+            .doc(chatId)
+            .update("participants", [...participants, ...listAddInGroupId.map(item => item.id)])
+            .then((snapshot) => {
+                console.log('THÊM THÀNH VIÊN VÀO NHÓM THÀNH CÔNG')
+            })
+            .catch((error) => {
+                console.error('LỖI THÊM THÀNH VIÊN VÀO NHÓM', error);
+            });
     }
 
     return(
@@ -73,24 +98,20 @@ function AddMember({navigation}){
             </View>
 
             <View style={styles.listFriendView}>
-                {participants?(
-                    participants.map((item)=>{
-                        const chatId = item.chatId;
-                        const participantIndex = item.participants.indexOf(userId);
-                        const friendId = item.participants[participantIndex];
-                        const friendName = item.name.split('/')[participantIndex];
-                        const picture = item.picture;
-                        const type = item.type;
+                {friendList ?(
+                    friendList.map((item)=>{
+                        const friendId = item.id;
+                        const friendName = item.displayName;
+                        const friendAvatar = item.profilePicture;
 
                         const friendItem = {
-                            id: chatId,
-                            image: picture,
+                            id: friendId,
+                            image: friendAvatar,
                             displayName: friendName,
                             userName: friendName,
-                            participants: item.participants,
                         }
                         return(
-                            type !== 'public' && <ListFriendView key={friendItem.id} item={friendItem} setListAddInGroupId={setListAddInGroupId} listGroup={listGroup}/>
+                            !participants.includes(friendId) && <ListFriendView key={friendItem.id} item={friendItem} setListAddInGroupId={setListAddInGroupId}/>
                         )
                     })
                 ):(
@@ -115,7 +136,7 @@ function AddMember({navigation}){
                         })}
                     </ScrollView>
                     <TouchableOpacity
-                        onPress={handleCreateGroup}
+                        onPress={handleAddMemberToGroup}
                         disabled={disableButtonCreate}
                     >
                         <FontAwesome name="arrow-circle-right" size={50} color="#33CCFF" />
@@ -129,9 +150,8 @@ function AddMember({navigation}){
 }
 
 
-function ListFriendView({item, setListAddInGroupId, listGroup}){
+function ListFriendView({item, setListAddInGroupId}){
     const [changeCheckbox, setChangeCheckbox] = useState(false);
-
 
     const handleSelectCheckbox = () =>{
         setChangeCheckbox(!changeCheckbox)
@@ -153,10 +173,6 @@ function ListFriendView({item, setListAddInGroupId, listGroup}){
         }
     }
 
-    // const image = item.image.split("|")[0]
-    const findMember = listGroup.find(item => item.id = item.id);
-
-
     return(
         <View style={styles.boxFriend}>
             <Image
@@ -169,18 +185,14 @@ function ListFriendView({item, setListAddInGroupId, listGroup}){
                 </Text>
             </View>
             <View style={{justifyContent:'center', marginRight:10}}>
-                {findMember?(
-                    <TouchableOpacity
-                        style={[styles.checkbox, changeCheckbox && styles.selectCheckbox]}
-                        onPress={handleSelectCheckbox}
-                    >
-                        {changeCheckbox &&(
-                            <Entypo name="check" size={15} color="white" />
-                        )}
-                    </TouchableOpacity>
-                ):(
-                    <Text>Member already in the group</Text>
+                <TouchableOpacity
+                    style={[styles.checkbox, changeCheckbox && styles.selectCheckbox]}
+                    onPress={handleSelectCheckbox}
+                >
+                    {changeCheckbox &&(
+                        <Entypo name="check" size={15} color="white" />
                     )}
+                </TouchableOpacity>
             </View>
         </View>
     )

@@ -2,11 +2,43 @@ import {Image, Text, TouchableOpacity, View} from "react-native";
 import {styles} from "../../css/chatHome/SeeMembers";
 import {FontAwesome} from "@expo/vector-icons";
 import {dataMembers} from "../../dataDemo/DataDemo";
+import {useEffect, useState} from "react";
+import {firestore} from "../../../config/FirebaseConfig";
 
 
 const listMember = dataMembers;
 
-function SeeMembers({navigation}){
+function SeeMembers({route, navigation}){
+    const { chatId } = route.params;
+
+    const [listMember, setListMember] = useState([]);
+
+    useEffect(() => {
+        firestore.collection("Chats")
+            .doc(chatId)
+            .get()
+            .then((snapshot) => {
+                const groupInfo = snapshot.data();
+                const participantIds = groupInfo.participants;
+                participantIds.forEach(id => {
+                    firestore.collection("Users")
+                        .doc(id)
+                        .get()
+                        .then((userSnapshot) => {
+                            const userInfo = userSnapshot.data();
+                            const isManager = groupInfo.managerId === userInfo.id;
+                            setListMember(pre => [...pre, {
+                                id: userInfo.id,
+                                image: userInfo.profilePicture,
+                                displayName: userInfo.display_name,
+                                userName: userInfo.username,
+                                permission: isManager ? "Leader" : "Member"
+                            }]);
+                        });
+                })
+            });
+    }, [chatId]);
+
     return(
         <View style={styles.container}>
             <View style={styles.title}>
