@@ -38,7 +38,7 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
           <Provider store={store}>
               <NavigationContainer>
-                  <Stack.Navigator initialRouteName={"RoomChat"}>
+                  <Stack.Navigator initialRouteName={"Login"}>
                       <Stack.Screen name='HomeLogin' component={HomeLogin} options={{ headerShown: false, }} />
                       <Stack.Screen name='Login' component={Login} />
                       <Stack.Screen name='Register' component={Register} />
@@ -69,7 +69,7 @@ export default function App() {
 
 function MyTabs(){
   return(
-      <Tab.Navigator initialRouteName={"PhoneBook"} >
+      <Tab.Navigator initialRouteName={"Chat"} >
         <Tab.Screen name={"Chat"} component={HomeChat}
                     options={{
                         headerShown:false,

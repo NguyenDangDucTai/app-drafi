@@ -60,6 +60,8 @@ function HomeChat({navigation}) {
                                     displayName: chatName,
                                     image: item.picture,
                                     content: latestMessage,
+                                    type: item.type,
+
                                 }}
                                 navigation={navigation}
                                 key={item.chatId}

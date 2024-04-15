@@ -44,6 +44,7 @@ function GroupsComponent({navigation}) {
                     let chatName = item.name;
                     let latestMessage = item?.messages && item?.messages?.length > 0 ? item.messages[item.messages.length - 1] : null;
 
+                    console.log( item)
                     return(
                         <MessageBox
                             key={item.chatId}
@@ -52,6 +53,7 @@ function GroupsComponent({navigation}) {
                                 displayName: chatName,
                                 image: item.picture,
                                 content: latestMessage,
+                                type: item.type,
                             }}
                             navigation={navigation}
                         />

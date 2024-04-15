@@ -1,10 +1,60 @@
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {styles} from "../../css/chatHome/InformationGroupRoom";
 import {AntDesign, Entypo, Feather, FontAwesome, Foundation, Octicons} from "@expo/vector-icons";
+import {firestore} from "../../../config/FirebaseConfig";
+import {useSelector} from "react-redux";
+import QueryKey from "../../constants/QueryKey";
+import {useQueryClient} from "@tanstack/react-query";
+import {useEffect, useState} from "react";
 
 
 function InformationGroupRoom({route, navigation}) {
     const { chatId } = route.params;
+    const user = useSelector((state) => state.userData);
+    const userId = user.id;
+    const queryClient = useQueryClient();
+
+    const [participants, setParticipants] = useState([]);
+    const [mangerId, setMangerId] = useState();
+    useEffect(() => {
+        firestore.collection("Chats")
+            .doc(chatId)
+            .get()
+            .then((snapshot) => {
+                setParticipants(snapshot.data().participants);
+                setMangerId(snapshot.data().managerId)
+            })
+    }, [chatId]);
+
+    const handleExitGroup = () =>{
+
+        if(mangerId === userId){
+            firestore.collection("Chats")
+                .doc(chatId)
+                .delete()
+                .then((snapshot) => {
+                    queryClient.invalidateQueries({ queryKey: [QueryKey.LIST_ALL_CHATS] });
+                    navigation.navigate("HomeChat")
+                })
+                .catch((error) => {
+                    console.error('LỖI THÊM THÀNH VIÊN VÀO NHÓM', error);
+                });
+        } else {
+            firestore.collection("Chats")
+                .doc(chatId)
+                .update("participants", [...participants.filter(user => user !== userId)])
+                .then((snapshot) => {
+                    queryClient.invalidateQueries({ queryKey: [QueryKey.LIST_ALL_CHATS] });
+                    navigation.navigate("HomeChat")
+                })
+                .catch((error) => {
+                    console.error('LỖI THÊM THÀNH VIÊN VÀO NHÓM', error);
+                });
+        }
+    }
+    const handleSettingGroup =()=>{
+        navigation.navigate("SettingGroup",{chatId})
+    }
 
     return(
         <View style={styles.container}>
@@ -106,18 +156,20 @@ function InformationGroupRoom({route, navigation}) {
                             </Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity
+                    {mangerId === userId &&(
+                        <TouchableOpacity
 
-                        style={styles.viewTouchable}
-                        onPress={()=>{navigation.navigate("SettingGroup")}}
-                    >
-                        <AntDesign name="setting" size={25} color="black" />
-                        <View style={styles.viewTitleTouchable}>
-                            <Text style={{fontSize:18}}>
-                                Setting group
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+                            style={styles.viewTouchable}
+                            onPress={handleSettingGroup}
+                        >
+                            <AntDesign name="setting" size={25} color="black" />
+                            <View style={styles.viewTitleTouchable}>
+                                <Text style={{fontSize:18}}>
+                                    Setting group
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
                     <TouchableOpacity style={styles.viewTouchable}>
                         <Feather name="trash" size={24} color="red" />
                         <View style={styles.viewTitleTouchable}>
@@ -126,11 +178,14 @@ function InformationGroupRoom({route, navigation}) {
                             </Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.viewTouchable}>
+                    <TouchableOpacity
+                        style={styles.viewTouchable}
+                        onPress={handleExitGroup}
+                    >
                         <Entypo name="log-out" size={24} color="red" />
                         <View style={styles.viewTitleTouchable}>
                             <Text style={{fontSize:18, color:"red"}}>
-                                Exitt group
+                                Exit group
                             </Text>
                         </View>
                     </TouchableOpacity>

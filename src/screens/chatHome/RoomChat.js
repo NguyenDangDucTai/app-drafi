@@ -10,6 +10,7 @@ import MessageType from "../../constants/MessageType";
 import { v4 as uuidv4 } from 'uuid';
 import {EmojiKeyboard} from "rn-emoji-keyboard";
 import {useDispatch, useSelector} from "react-redux";
+import {firestore} from "../../../config/FirebaseConfig";
 
 
 
@@ -34,11 +35,15 @@ const HEIGHT = Dimensions.get('window').height;
 function RoomChat({ route, navigation}) {
     // const chatId = "5c092444-8fc8-4d46-9698-8bfbc5ffae5a"
     // const roomName = "hagha";
-    // const userId = "3fd31c45-cef4-4588-94aa-0c2e998b055d"
+    // const userId = "1890e10d-33c3-40d8-bac6-fcd81ed4ce42"
     // const displayName = "Pham Hoc Gioi";
+    // const type = "public"
+
 
     const { chatId, roomName, type} = route.params;
     console.log('PARAMS', route.params);
+    console.log(type)
+
 
     //lấy my user từ redux
     const user = useSelector((state) => state.userData);
@@ -122,10 +127,13 @@ function RoomChat({ route, navigation}) {
         }));
     }
 
+
     const fileList = importAllFile(
         require.context("../../image/fileChat/file", false, /.*$/)
     );
     console.log(fileList)
+
+
 
     const [listSelectFile, setListSelectFile] = useState([]);
     const [openFile, setOpenFile] = useState(false);
@@ -145,16 +153,19 @@ function RoomChat({ route, navigation}) {
         }
     }, [listSelectFile]);
 
+    const handleSendFile = () =>{
+
+    }
 
     const handleChangeInfomation=()=>{
         if(type==="private"){
             navigation.navigate("InformationSingleRoom", {
-
+                chatId
             })
-        } else{
-            navigation.navigate("InformationGroupRoom")
+        } if(type ==="public"){
+            navigation.navigate("InformationGroupRoom", {chatId})
         }
-        // navigation.navigate("InformationGroupRoom")
+        //
     }
 
 
@@ -301,7 +312,10 @@ function RoomChat({ route, navigation}) {
                     </ScrollView>
                     {viewSendFile && (
                         <View style={{position:'absolute', bottom:10, alignItems:'center', width:"100%"}}>
-                            <TouchableOpacity style={styles.btnSendImage}>
+                            <TouchableOpacity
+                                onPress={handleSendFile}
+                                style={styles.btnSendImage}
+                            >
                                 <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>
                                     Send image {listSelectFile.length}
                                 </Text>

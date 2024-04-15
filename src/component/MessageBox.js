@@ -10,7 +10,7 @@ function MessageBox({item, navigation}) {
             onPress={()=>{navigation.navigate("RoomChat", {
                 chatId: item.id,
                 roomName: item.displayName,
-                type: item.type
+                type: item.type,
             })}}
         >
             <View style={styles.img}>

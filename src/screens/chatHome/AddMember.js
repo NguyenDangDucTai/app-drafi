@@ -62,6 +62,7 @@ function AddMember({route, navigation}){
             .update("participants", [...participants, ...listAddInGroupId.map(item => item.id)])
             .then((snapshot) => {
                 console.log('THÊM THÀNH VIÊN VÀO NHÓM THÀNH CÔNG')
+                navigation.goBack()
             })
             .catch((error) => {
                 console.error('LỖI THÊM THÀNH VIÊN VÀO NHÓM', error);

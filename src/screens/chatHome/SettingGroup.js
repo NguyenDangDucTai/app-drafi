@@ -1,11 +1,28 @@
 import {Text, TouchableOpacity, View, Modal, Button} from "react-native";
 import {styles} from "../../css/chatHome/SettingGroup";
 import {FontAwesome} from "@expo/vector-icons";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {firestore} from "../../../config/FirebaseConfig";
+import QueryKey from "../../constants/QueryKey";
+import {useQueryClient} from "@tanstack/react-query";
+import {useSelector} from "react-redux";
 
-function SettingGroup({navigation}){
+function SettingGroup({navigation, route}){
 
     const [showModal, setShowModal] = useState(false);
+    const { chatId } = route.params;
+    const queryClient = useQueryClient();
+    const user = useSelector((state) => state.userData);
+    const userId = user.id;
+    const [mangerId, setMangerId] = useState();
+    useEffect(() => {
+        firestore.collection("Chats")
+            .doc(chatId)
+            .get()
+            .then((snapshot) => {
+                setMangerId(snapshot.data().managerId)
+            })
+    }, [chatId]);
 
     const handleManageMember= () =>{
 
@@ -22,9 +39,20 @@ function SettingGroup({navigation}){
     const handlePermissionToSend = () =>{
 
     }
+
+
     const [showModalDisband, setShowModalDisband] = useState(false);
     const handleDisbandGroup = () =>{
-        setShowModalDisband(!showModalDisband)
+        firestore.collection("Chats")
+            .doc(chatId)
+            .delete()
+            .then((snapshot) => {
+                queryClient.invalidateQueries({ queryKey: [QueryKey.LIST_ALL_CHATS] });
+                navigation.navigate("HomeChat")
+            })
+            .catch((error) => {
+                console.error('LỖI THÊM THÀNH VIÊN VÀO NHÓM', error);
+            });
     }
 
 

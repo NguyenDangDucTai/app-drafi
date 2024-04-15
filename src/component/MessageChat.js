@@ -3,10 +3,14 @@ import {styles} from "../css/component/MessageChat";
 import {useState} from "react";
 import {deleteMessage} from "../api/chatApi";
 import {AntDesign, Feather, FontAwesome, MaterialCommunityIcons} from '@expo/vector-icons';
+import moment from "moment-timezone";
 
 function MessageChatReceiver({msg, chatId}) {
 
     const content = msg.content;
+    const listcontent = content.split("|")
+    listcontent.pop();
+
 
     return(
         <View style={styles.messageBoxReceiver}>
@@ -24,19 +28,19 @@ function MessageChatReceiver({msg, chatId}) {
                 )}
             </View>
             <View >
-                {msg.type === "image" && (content.split("|").map((item, index) => {
+                {msg.type === "image" && (listcontent.map((item, index) => {
                     return(
                         <View style={styles.messageFile}>
-                            <ImageChat content={item}/>
+                            <ImageChat content={item} msg={msg}/>
                         </View>
                     )
                 }))}
             </View>
             <View style={{maxWidth:"70%"}}>
-                {msg.type === "files" && (content.split("|").map((item, index) => {
+                {msg.type === "files" && (listcontent.map((item, index) => {
                         return(
                             <View style={styles.messageFile}>
-                                <FileChat content={item}/>
+                                <FileChat content={item} msg={msg}/>
                             </View>
                         )
                     })
@@ -54,7 +58,11 @@ function MessageChatSender({msg, chatId}) {
     const [hiddenWhenDelete, setHiddenWhenDelete] = useState(true);
 
     const content = msg.content;
+    const listcontent = content.split("|")
+    listcontent.pop();
     const handleDeleteMessage = () =>{
+
+
         deleteMessage({chatId, messageId})
             .then(()=>{
                 setHiddenWhenDelete(false)
@@ -64,6 +72,13 @@ function MessageChatSender({msg, chatId}) {
                 console.error(error)
             })
     }
+    const handleShareMessage =() =>{
+
+    }
+    const handleReplyMessage = () =>{
+        x
+    }
+
 
 
     return (
@@ -80,19 +95,19 @@ function MessageChatSender({msg, chatId}) {
                             </View>
                         )}
                         <View>
-                            {msg.type === "image" && (content.split("|").map((item, index) => {
+                            {msg.type === "image" && (listcontent.map((item, index) => {
                                 return(
                                     <View style={styles.messageFile}>
-                                        <ImageChat content={item}/>
+                                        <ImageChat content={item} msg={msg}/>
                                     </View>
                                 )
                             }))}
                         </View>
                         <View style={{maxWidth:"70%"}}>
-                            {msg.type === "files" && (content.split("|").map((item, index) => {
+                            {msg.type === "files" && (listcontent.map((item, index) => {
                                     return(
                                         <View style={styles.messageFile}>
-                                            <FileChat content={item}/>
+                                            <FileChat content={item} msg={msg}/>
                                         </View>
                                     )
                                 })
@@ -113,7 +128,6 @@ function MessageChatSender({msg, chatId}) {
                             <TouchableOpacity style={{marginHorizontal:5, marginLeft:5, borderRadius:5}}>
                                 <MaterialCommunityIcons name="comma" size={15} color="#33CCFF" />
                             </TouchableOpacity>
-
                         </View>
                     )}
                 </View>
@@ -134,7 +148,7 @@ function TextBox({content}){
     )
 }
 
-function ImageChat({content}){
+function ImageChat({content, msg}){
 
     return(
         <View>
@@ -149,12 +163,13 @@ function ImageChat({content}){
 }
 
 
-function FileChat({content}){
+function FileChat({content, msg}){
     return(
         <View style={{padding:10}}>
             {content.length !== 0 &&(
-                <TouchableOpacity style={{flexDirection:"row"}}>
+                <TouchableOpacity style={{}}>
                     <AntDesign name="filetext1" size={70} color="black" />
+                    {/*<Text>{moment(msg.content.timestamp).format("HH:mm")}</Text>*/}
                 </TouchableOpacity>
             )}
         </View>
