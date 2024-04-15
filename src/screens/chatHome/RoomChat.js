@@ -32,18 +32,18 @@ const HEIGHT = Dimensions.get('window').height;
 //xử lý button mở setting room
 
 function RoomChat({ route, navigation}) {
-    const chatId = "5c092444-8fc8-4d46-9698-8bfbc5ffae5a"
-    const roomName = "hagha";
-    const userId = "3fd31c45-cef4-4588-94aa-0c2e998b055d"
-    const displayName = "Pham Hoc Gioi";
+    // const chatId = "5c092444-8fc8-4d46-9698-8bfbc5ffae5a"
+    // const roomName = "hagha";
+    // const userId = "3fd31c45-cef4-4588-94aa-0c2e998b055d"
+    // const displayName = "Pham Hoc Gioi";
 
-    // const { chatId, roomName, type} = route.params;
+    const { chatId, roomName, type} = route.params;
     console.log('PARAMS', route.params);
 
     //lấy my user từ redux
     const user = useSelector((state) => state.userData);
-    // const userId = user.id;
-    // const displayName = user.display_name;
+    const userId = user.id;
+    const displayName = user.display_name;
 
     console.log('UUUUU', user);
 
